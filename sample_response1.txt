@@ -1,0 +1,14 @@
+
+
+
+HP printer motor 142ppr.
+
+Ref=300
+Ilk gecikme: 316-309= 7samples
+
+from: (316,0)  to:(330, 300)
+
+Dy/dx= (300-0)/330/316= 300/14 = 21.4 (samples/pulses)
+
+
+

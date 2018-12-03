@@ -1,0 +1,195 @@
+
+MotorContr01
+
+2018/10/22
+
+First written. Merged source from Encoder02 (encoder read) and PWMTIM2_HBr01 (PWM gen).
+
+PIN Connections
+ Encoder inputs:
+ TIM1 CH1: PC6 (After remapping of AFR0)
+ TIM1 CH2: PC7 (After remapping of AFR0)
+ //CW rotation increases counter.
+
+ PWM outputs:
+ TIM2 CH1: PC5 (After remapping of AFR0) Was:PD4
+ TIM2 CH2: PD3
+ Removed: LED: PD6
+ LED On-board: PB5
+ SCL: PB4
+ SDA: PB5
+ 
+ LCD:
+ CS: PA1
+ WR: PA2
+ DAT: PA3
+
+ PD5: UART1 TX
+ PD6: UART1 RX
+ PC4: AIN2 -> See elektronik/ARM/stm8/Benim/ADC1_Threshold
+ PC3: LED
+
+Used Pins:
+PA1, PA2, PA3  -PA: FULL
+PB5 (PB4, PB5: I2C): PB: FULL
+PC3, PC4, PC5, PC6, PC7
+(PD1:SWIM),PD3,PD5,PD6: Unused:PD2:AIN3,  PD4
+
+Apparently the motor is 142 pulses/rev.
+
+2018/11/02:
+Managed to get PWM working. It limits the output. 
+Implemented a straightforward PID control with parameters found using trial and error. The reference is a fixed 500 counts.
+
+The control brings the position to reference with some oscillations.
+
+2018/11/02:
+MotorControl02:
+
+Implemented straightforward "anti windup".
+  If control signal saturates, do not add up integrator.
+
+DONE: Increase the encoder limit to greater than 1000 counts. Now +-1600.
+
+DONE: Implemented negative encoder counts.
+The encoder number of counts is about 160 (TBD).
+-1600~1599 counts will be implemented.
+
+-Method 1: - Abandoned.
+Read encoder.
+Add 1600
+Take Modulo 3200
+Subtract 1600.
+(Optional) Multiply by ppr to rad
+
+-Method 2:- Used:
+TIM1 ARR value is set in libs/tim1.h as ENC_RANGE value.
+Set TIM1 ENC_RANGE to 3200. Set ENC_ABS_RANGE=1600
+Read encoder: encval.
+Add 1600.
+If value is less than ENC_ABS_RANGE, use it as is; encval.
+If value is greater than ENC_ABS_RANGE, use encval-ENC_RANGE
+
+DONE: Implemented square wave reference signal.
+A sequence of references are defined, and the system moves through each in sequence, pausing a constant amount of time in between.
+
+Done: Removed stm8s_tim2.c library dependence to reduce memory footprint.
+      It will releived about 1.5k. From about 6.1kB to 4754Bytes.
+
+2018/11/04
+MotorControl03:
+
+Modified the main code to move the control calculation and encoder reading to their own functions.
+
+Also created a struct to make the control and encoder variables passable to functions.
+
+Simplified the LED on/off defines. They were calculated by shifting at every call. The shifts were replaced by constants wich were hand-calculated.
+
+On-board LED is also active now. It is turned on during every sampling time.
+
+DONE: LED turned on when control saturates. OK to do every sample.
+
+TODO: Calculate the PID values using the ultimate stability method. Determine the control gain Ku for continued oscillation and Pu period of oscillation.
+Not very reliable, but:
+for Ku=40, Vcc=7.00V, Imax=700mA
+Pu=~1/3s
+
+Kp=1.6Ku=64
+Ti=0.5Pu= 0.16665
+Td=0.125Pu= .04166
+Ki=Kp/Ti= 384
+Kd=Kp*Td=2.66624
+However, this causes saturation of control.
+This can be solved by higher voltage (and thus current). Target 12V.
+However, the motor driver is not sufficient in this case.
+-> Bigger driver is necessary.
+2018/11/07:
+Installed bigger driver; a common LM298 board. It supplies 5V to the board as well as the mower amplifier duty.
+Performance is better but not stellar.
+-> Faster control loop is necessary. Reduce sampling time as much as possible.
+   Tried 10ms but there was not a great improvement.
+DONE: Increase control loop sampling time to 1kHz. Check with LED or other pin.
+      (On board LED is now free.)
+      See 2018/11/10.
+   1ms does not seem easily achievable. An oscilloscope is necessary to determine CPU load and control timing frequency. Simple CPU load appears possible using on board LED (LEDOB) but flickers a lot. Why?
+   Multimeter at frequency and duty ratio setting produces 50Hz and 50%. 
+
+2018/11/10:
+MotorControl04:
+
+Modified the PID coefficients to int8_t. The control calculation time dropped down from about 700us to 35us.
+Furter modified PID coefficients such that they are int16_t, and have accompanying shift values so that they are divided by 2^n. This worked very effectively and provided fine control.
+Also, the control signal was modified to int32_t because, at very high errors, the previous int16_t overflowed.
+
+Even with the shifting and wider control word width, the control calculation takes about 57us. Quite affordable.
+
+DONE: Move PWM to higher frequency.
+THINKS:      This is not a good idea. PWM timer is TIM2. TIM2 has prescaler already at 1. Any further increase of PWM frequency will cause decrease in PWM resolution. Better way is to increase the motor voltage. (Current simple motor driver has 15V limit...
+
+2018/11/15:
+However, simply modifying TIM2_ARR defined in tim2.h to a much higher value (2000), caused a PWM of 8kHz. The transient was not noticeably effected. The control became noticeably sharper. The overshoot was reduced.
+Further increasing PWM to 16kHz (TIM2_ARR=1000) caused control to saturate at the oscillations after overshoot and did not result in a better control compared to 8kHz.
+The high PWM frequency had the drawback that control easily saturates if there is an external disturbance...
+
+
+2018/11/15:
+MotorControl05:
+
+When the control signal saturates, the integral error is reset. This seems to give better control, since when the reference is reached there is no integral error to reduce.
+
+Currently the program size is 2996 Bytes.
+
+2018/11/16:
+MotorControl06:
+Control sampling time was separated from MS interrupt. It is now possible to
+impelement sub-ms sampling.
+Systick is generated at sub ms intervals. millisecond signal is then generated by counting the number of occurrances of Systick.
+
+Ts and MS_count variables were eliminated. TimerEventFlag was replaced by:
+MS_TickEventFlag: Each ms a signal is generated for general housekeeping.
+CTRL_EventFlag: generated at each Ts.
+
+
+TODO: Change PID. Remove ref changes from D calculation. D only depends on Y.
+      See Astrom's book on implementation of digital PID.
+DONE: See this github page:
+      https://github.com/arduinoNube/digital-pid-classroom-demo
+      Also Video on OS.
+
+Hardware addition:
+ PD5: UART1 TX
+ PD6: UART1 RX
+ 
+ PC4: AIN2 -> See elektronik/ARM/stm8/Benim/ADC1_Threshold
+ Relocated LED to PC3.
+
+
+2018/11/22:
+
+Serial control was implemented (see UART1_Printf04). It is implemented such that periodically (every PRINT_PERIOD ms) the reference and current position are copied to the prit buffer, preceded by a synchronization header of:0xAA, 0x55.
+
+The buffer is then sent from the serial port in the main loop as soon as the TX send register is empty, in a non-blocking manner. The data is 16bit signed, sent as MSB first (big endian). It is possible to send more data, simply send it less often so that in average it fits into the available time interval.
+
+The data can be successfully captured from Serial Plot program.
+
+The total code size is now 4989 Bytes. 3K more FLASH space is available.
+
+
+
+DONE: Implement ADC to generate the reference, such as with a potentiometer. The reference is read by ADC after every control loop. It works nicely
+
+When ADC was implemented for the first time and the ADC was turned on, the code did not work correctly. It turned out that too many ADC interrupts were flooding the processor because continuous operation was selected.
+
+
+Saturation LED stopped working. (LED worked physically.) It turned out that the ADC initialization included a De-Init of the GPIO port of the LED. Removing that part fixed the problem. The De-Init is not necessary for power-on resets, and the port settings are not modified after. So this is a satisfactory fix. 
+
+
+The computation time was measured on the oscilloscope to be 58us, the period 500us. So there is a lot of time to add more work on the processor. The sampling time is stable, except at transients of the reference, some samples may shift within the period. Check why.
+
+The control signal was also added to the list of items to be sent to the PC.
+
+A 1st order digital LPF was added to the analog reference reading to make it more steady. It worked as expected.
+
+
+TODO: Change the structure of the program, so that main() runs the parameter adjustments, screen refresh etc, and the ISR directly does control.
+
