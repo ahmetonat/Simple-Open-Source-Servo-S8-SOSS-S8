@@ -27,7 +27,7 @@ It is very satisfactory see the motor follow reference signal, observe overshoot
 ## Hardware:
 **SOSS-S8** uses very low cost off the shelf components:
 
-- STM8S103F3P6 processor (STM8 or S8), ~$1~2 :[See this](https://www.banggood.com/STM8S103F3P6-System-Board-STM8S-STM8-Development-Board-Minimum-Core-Board-p-1195874.html?cur_warehouse=CN)
+- STM8S103F3P6 processor (STM8 or S8), ~$1-2 :[See this](https://www.banggood.com/STM8S103F3P6-System-Board-STM8S-STM8-Development-Board-Minimum-Core-Board-p-1195874.html?cur_warehouse=CN)
 - DC motor with optical incremental encoder. Either salvaged from an old ink jet printer, or [China ~$3.5](https://www.aliexpress.com/item/Great-Johnson-2pcs-20MA-Standard-130-motor-Green-Micro-DC-motor-with-encoder-32-lines-of/1958806724.html)
 - Power amplifier (H-bridge); [ubiquitious L298 is perfectly fine; ~$2.5](https://www.banggood.com/Wholesale-Dual-H-Bridge-DC-Stepper-Motor-Drive-Controller-Board-Module-Arduino-L298N-p-42826.html?rmmds=search&cur_warehouse=CN)
 - 7 segment LCD display (not necessary, but very informative) such as a [HT1621 module from DX, ~$3](https://www.dx.com/p/2-4-6-digit-7-segment-lcd-display-module-white-backlit-for-arduino-2071629)
