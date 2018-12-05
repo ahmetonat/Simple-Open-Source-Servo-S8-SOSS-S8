@@ -46,6 +46,6 @@ Finally, all you should need to do is
 ```
 make flash
 ```
-and it should compile first the files in the 'libs' folder, produce the local library file 'projectlib.lib', then continue with motor.c, and finally, if **SOSS-S8** is connected to your computer, it will be uploaded and ran. 
+and it should automatically compile first the files in the 'libs' folder, produce the local library file 'projectlib.lib', then continue with motor.c, and finally, if **SOSS-S8** is connected to your computer, it will be uploaded and ran. 
 
 So, go ahead and build yourself a **SOSS-S8** and try your hand at closed loop control implementation!
