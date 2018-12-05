@@ -38,7 +38,7 @@ It is very satisfactory see the motor follow the reference signal, observe overs
 - Some protoboard, wires LEDs etc.
 Most of the components are already laying around in a typical workshop, but even if you buy them all, the maximum cost is less than $20. The circuit connections are very simple and can be done on a breadboard using the common "DuPont" patch cables in a few minutes.
 
-##How to install and run
+## How to install and run
 
 The circuit connections can be found in the file motor.c as comments at the begining of the file. To build the firmware, you need to have sdcc installed as well as STM8S Standard Peripheral Library (one simple modification to the library is needed to make it sdcc compatible) and a programmer software for the device programmer. GNU make and I discuss [how to install the development environment in another blog post](https://aviatorahmet.blogspot.com/2018/01/programming-stm8s-using-sdcc-and-gnu.html). You should test a few simple firmware projects to make sure they work before attempting this one. You can try the [timebase project](https://aviatorahmet.blogspot.com/2018/09/stm8s-time-base-using-sdcc.html) for example. About the only modification to the source is to modify both 'Makefile's, one in the main directory, and the other within 'libs' folder, to tell the compiler the path to the ST libraries. Windows users beware backslash '\' should replace forward slash '/' in the path values!
 
