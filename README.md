@@ -13,8 +13,8 @@ Feedback position control servo for STM8 and SDCC.
 
 It is very satisfactory see the motor follow the reference signal, observe overshoot, steady state error, instabilities etc. or tune the control loop using textbook methods like Ziegler Nichols to achieve fast response and zero steady stete error. But the real value comes when you connect the **SOSS-S8** to your computer and see the control signals on your computer, in real-time, using the excellent [SerialPlot software](https://bitbucket.org/hyOzd/serialplot), which is also open source. The development was done in Linux, but it is perfectly valid for Windows or MacOS-X also.
 
-![It looks like this...](https://github.com/ahmetonat/Simple-Open-Source-Servo-S8-SOSS-S8/edit/master/IMG_0923.JPG)
-
+![It looks like this...](https://github.com/ahmetonat/Simple-Open-Source-Servo-S8-SOSS-S8/blob/master/IMG_0923.JPG)
+![It looks like this...](https://github.com/ahmetonat/HT1621-LCD-on-STM8S/blob/master/DSCN7022.JPG)
 
 ## Specifications:
 
