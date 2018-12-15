@@ -1,7 +1,7 @@
 # Simple-Open-Source-Servo-S8: SOSS-S8
 Feedback position control servo for STM8 and SDCC.
 
-**SOSS-S8** is a feedback position controller for DC motors using an incremental encoder for feedback. Its main puropse is education, by allowing anyone to implement a position servo using very low cost components and open source software tools. You can learn many things with **SOSS-S8**:
+[**SOSS-S8**](https://aviatorahmet.blogspot.com/2018/12/soss-s8-simple-open-source-servo-stm8s.html) is a feedback position controller for DC motors using an incremental encoder for feedback. Its main puropse is education, by allowing anyone to implement a position servo using very low cost components and open source software tools. You can learn many things with **SOSS-S8**:
 
 - Basic concepts in feedback control systems implementation (PID etc),
 - Convert continuous time designs into discrete time (digital control),
@@ -47,5 +47,7 @@ Finally, all you should need to do is
 make flash
 ```
 and it should automatically compile first the files in the 'libs' folder, produce the local library file 'projectlib.lib', then continue with motor.c, and finally, if **SOSS-S8** is connected to your computer, it will be uploaded and ran. 
+
+[See the project page for more info.](https://aviatorahmet.blogspot.com/2018/12/soss-s8-simple-open-source-servo-stm8s.html)
 
 So, go ahead and build yourself a **SOSS-S8** and try your hand at closed loop control implementation!
